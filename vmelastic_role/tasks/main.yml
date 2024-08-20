@@ -59,7 +59,7 @@
     mode: '0777'
 
 - name: copy Docker Compose file on remote host
-  copy:
+  template:
     src: ../templates/docker-compose.j2
     dest: /data/docker/elk/docker-compose.yml
     mode: '0777'

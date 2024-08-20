@@ -80,7 +80,7 @@
   shell: "cd /var/log && chmod -R 777 nginx/"
 
 - name: copy filebeat file on remote host
-  copy:
+  template:
     src: ../templates/filebeat.j2
     dest: /data/docker/elk/filebeat/filebeat.yml
     mode: '0744'
