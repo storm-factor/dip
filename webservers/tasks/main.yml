@@ -1,0 +1,91 @@
+---
+# tasks file for webservers
+- name: install nginx
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+
+- name: copy html file for nginx
+  template:
+    src: ../templates/html.j2
+    dest: /var/www/html/index.html
+    mode: '0777'
+  notify:
+    - restart nginx
+
+- name: create dir data docker
+  file:
+    path: /data/docker/
+    state: directory
+    mode: '0777'
+
+- name: install packages
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg-agent
+      - software-properties-common
+    state: latest
+    update_cache: yes
+
+- name: add GPG key docker
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: repo docker
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+    state: present
+
+- name: install docker
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state: latest
+    update_cache: yes
+
+- name: add users in group docker
+  user:
+    name: "{{ item }}"
+    groups: docker
+    append: yes
+  loop:
+    - force
+
+- name: install docker-compose
+  get_url:
+    url: https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64
+    dest: /usr/local/bin/docker-compose
+    mode: '755'
+
+- name: create dir filebeat
+  file:
+    path: /data/docker/elk/filebeat
+    state: directory
+    mode: '0777'
+
+- name: copy Docker Compose file on remote host
+  copy:
+    src: ../files/docker-compose.yml
+    dest: /data/docker/elk/docker-compose.yml
+    mode: '0777'
+
+- name: chmod 777 nginx files
+  shell: "cd /var/log && chmod -R 777 nginx/"
+
+- name: copy filebeat file on remote host
+  copy:
+    src: ../templates/filebeat.j2
+    dest: /data/docker/elk/filebeat/filebeat.yml
+    mode: '0744'
+
+- name: run docker-compose
+  community.docker.docker_compose_v2:
+    project_src: /data/docker/elk/
+    state: present

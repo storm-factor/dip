@@ -1,0 +1,12 @@
+
+services:
+  kibana:
+    image: kibana:7.17.2
+    container_name: kibana
+    restart: always
+    ports:
+      - "5601:5601"
+    environment:
+      cluster.name: my-elk-cluster
+    volumes:
+      - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml

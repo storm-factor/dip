@@ -1,0 +1,15 @@
+.terraform/
+.terraform.lock.hcl
+.terraform.tfstate.lock.info
+terraform.tfstate
+terraform.tfstate.backup
+terraform.tfvars
+meta.txt
+key.json
+inv.ini
+.idea
+kibana_role/vars/*
+vmelastic_role/vars/*
+zabbix-agent_role/vars/*
+zabbix-server_role/vars*
+vmelastic_role/vars/*

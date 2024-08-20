@@ -1,0 +1,11 @@
+
+services:
+  filebeat:
+    image: elastic/filebeat:7.17.2
+    restart: always
+    container_name: filebeat
+    environment:
+      cluster.name: my-elk-cluster
+    volumes:
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - /var/log/nginx/:/log_nginx/

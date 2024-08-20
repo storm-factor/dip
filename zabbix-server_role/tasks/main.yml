@@ -1,0 +1,128 @@
+---
+# tasks file for zabbix-server_role
+
+#- name: create user zabbix for PostgreSQL
+#  ansible.builtin.postgresql_user:
+#    db: zabbix
+#    name: zabbix
+#    password: "{{ zabbix_user_password }}"
+#    state: present
+#    login_host: localhost
+#    login_database: postgres
+#    login_user: postgres
+#    login_password: "{{ postgres_password }}"
+#
+#- name: create bd zabbix
+#  ansible.builtin.postgresql_db:
+#    name: zabbix
+#    owner: zabbix
+#    login_host: localhost
+#    login_database: postgres
+#    login_user: postgres
+#    login_password: "{{ postgres_password }}"
+
+
+- name: install postgresql
+  apt:
+    name: postgresql
+    state: present
+    update_cache: yes
+
+- name: install zabbix-repo
+  get_url:
+    url: https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_7.0-2+ubuntu24.04_all.deb
+    dest: /tmp/zabbix-release_7.0-2+ubuntu24.04_all.deb
+    mode: '755'
+
+- name: Install a .deb zabbix repo package
+  ansible.builtin.apt:
+    deb: /tmp/zabbix-release_7.0-2+ubuntu24.04_all.deb
+
+- name: apt update after install deb packages for zabbix
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: install packages
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  loop:
+    - apache2
+    - php
+    - libapache2-mod-php
+    - mc
+    - zabbix-server-pgsql
+    - zabbix-frontend-php
+    - php8.3-pgsql
+    - zabbix-apache-conf
+    - zabbix-sql-scripts
+    - zabbix-agent
+    - python3-psycopg2
+
+#- name: create user in postgres
+#  postgresql_user:
+#    name: zabbix
+#    password: "{{ postgres_user_password }}"
+#    login_unix_socket: "/var/run/postgresql"
+#    login_user: postgres
+#    state: present
+#  become: true
+#
+#- name: create user and bd in postgresql
+#  postgresql_db:
+#    name: zabbix
+#    state: present
+#    owner: zabbix
+#    login_unix_socket: "/var/run/postgresql"
+#  become: true
+
+- name: create dir
+  file:
+    path: /data/
+    state: directory
+    mode: '0777'
+
+- name: check file /data/checkfile1
+  stat:
+    path: /data/checkfile1
+  register: file_check1
+
+- name: check file /data/checkfile2
+  stat:
+    path: /data/checkfile2
+  register: file_check2
+
+- name: create user and bd
+  block:
+    - name: create user and bd
+      shell: |
+        su - postgres -c 'psql --command "CREATE USER {{ user_zb }} WITH PASSWORD '\''{{ zabbix_user_password }}'\'';"' &&
+        su - postgres -c 'psql --command "CREATE DATABASE {{ user_zb }} OWNER {{ user_zb }};"' &&
+        sed -i 's/# DBPassword=/DBPassword={{ zabbix_user_password }}/g' /etc/zabbix/zabbix_server.conf &&
+        touch /data/checkfile1
+  when: not file_check1.stat.exists
+
+- name: import bd set
+  block:
+    - name: import bd
+      shell: |
+        zcat /usr/share/zabbix-sql-scripts/postgresql/server.sql.gz | sudo -u {{ user_zb }} psql {{ user_zb }} &&
+        touch /data/checkfile2
+      notify:
+          - restart zabbix services
+          - restart apache2
+  when: not file_check2.stat.exists
+
+#- name: set zabbix-server
+#  template:
+#    src: /etc/zabbix/zabbix_server.conf.j2
+#    dest: /etc/zabbix/zabbix_server.conf
+#  notify:
+#    - restart zabbix services
+
+#- name: restart apache2
+#  service:
+#    name: apache2
+#    state: restarted
+#    enabled: yes

@@ -1,0 +1,18 @@
+
+services:
+  elasticsearch:
+    image: elasticsearch:7.17.2
+    restart: always
+    container_name: elasticsearch
+#    volumes:
+#      - ./elk-config/elasticsearch:/usr/share/elasticsearch/config
+    environment:
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+      ELASTIC_PASSWORD: "{{ elastic_password }}"
+      discovery.type: single-node
+      cluster.name: my-elk-cluster
+      network.host: 0.0.0.0
+      xpack.security.enabled: "true"
+    ports:
+      - "9200:9200"
+      - "9300:9300"

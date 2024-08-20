@@ -1,0 +1,16 @@
+
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /log_nginx/access.log*
+    - /log_nginx/error.log*
+
+output.elasticsearch:
+  hosts: ["http://192.168.10.44:9200"]
+  username: "{{ elastic_username }}"
+  password: "{{ elastic_password }}"
+setup.kibana:
+  host: ["192.168.10.150:5601"]
+
+#logging.level: debug

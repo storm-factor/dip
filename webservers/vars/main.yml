@@ -1,0 +1,7 @@
+---
+# vars file for webservers
+
+hostname: "{{ansible_host}}"
+
+elastic_username: elastic
+elastic_password: netopass1044

@@ -1,0 +1,13 @@
+---
+# handlers file for zabbix-server_role
+- name: restart zabbix services
+  service:
+    name: zabbix-server
+    state: restarted
+    enabled: yes
+
+- name: restart apache2
+  service:
+    name: apache2
+    state: restarted
+    enabled: yes
