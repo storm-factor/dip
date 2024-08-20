@@ -4,25 +4,25 @@
   become: yes
   gather_facts: yes
   tasks:
-#    - name: Ensure elastic role is applied to bastion_hosts group
-#      include_role:
-#        name: vmelastic_role
-#      when: "'elastic' in group_names"
-#
-#    - name: Ensure webservers role is applied to web_servers group
-#      include_role:
-#        name: webservers
-#      when: "'web' in group_names"
-#
-#    - name: Ensure kibana role is applied to bastion_hosts group
-#      include_role:
-#        name: kibana_role
-#      when: "'kibana' in group_names"
-#
-#    - name: Ensure zabbix-agent role is applied to all group
-#      include_role:
-#        name: zabbix-agent_role
-#      when: "'zabbix' not in group_names"
+    - name: Ensure elastic role is applied to bastion_hosts group
+      include_role:
+        name: vmelastic_role
+      when: "'elastic' in group_names"
+
+    - name: Ensure webservers role is applied to web_servers group
+      include_role:
+        name: webservers
+      when: "'web' in group_names"
+
+    - name: Ensure kibana role is applied to bastion_hosts group
+      include_role:
+        name: kibana_role
+      when: "'kibana' in group_names"
+
+    - name: Ensure zabbix-agent role is applied to all group
+      include_role:
+        name: zabbix-agent_role
+      when: "'zabbix' not in group_names"
 
     - name: Ensure zabbix-server role is applied to bastion_hosts group
       include_role:

@@ -1,26 +1,4 @@
 ---
-# tasks file for zabbix-server_role
-
-#- name: create user zabbix for PostgreSQL
-#  ansible.builtin.postgresql_user:
-#    db: zabbix
-#    name: zabbix
-#    password: "{{ zabbix_user_password }}"
-#    state: present
-#    login_host: localhost
-#    login_database: postgres
-#    login_user: postgres
-#    login_password: "{{ postgres_password }}"
-#
-#- name: create bd zabbix
-#  ansible.builtin.postgresql_db:
-#    name: zabbix
-#    owner: zabbix
-#    login_host: localhost
-#    login_database: postgres
-#    login_user: postgres
-#    login_password: "{{ postgres_password }}"
-
 
 - name: install postgresql
   apt:
@@ -60,22 +38,6 @@
     - zabbix-agent
     - python3-psycopg2
 
-#- name: create user in postgres
-#  postgresql_user:
-#    name: zabbix
-#    password: "{{ postgres_user_password }}"
-#    login_unix_socket: "/var/run/postgresql"
-#    login_user: postgres
-#    state: present
-#  become: true
-#
-#- name: create user and bd in postgresql
-#  postgresql_db:
-#    name: zabbix
-#    state: present
-#    owner: zabbix
-#    login_unix_socket: "/var/run/postgresql"
-#  become: true
 
 - name: create dir
   file:
@@ -114,15 +76,3 @@
           - restart apache2
   when: not file_check2.stat.exists
 
-#- name: set zabbix-server
-#  template:
-#    src: /etc/zabbix/zabbix_server.conf.j2
-#    dest: /etc/zabbix/zabbix_server.conf
-#  notify:
-#    - restart zabbix services
-
-#- name: restart apache2
-#  service:
-#    name: apache2
-#    state: restarted
-#    enabled: yes
