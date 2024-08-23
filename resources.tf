@@ -133,6 +133,28 @@ resource "yandex_alb_load_balancer" "ya_load_balancer" {
   }
 }
 
+resource "yandex_compute_snapshot_schedule" "snapshot_disks" {
+  name = "snapshot-every-day-ttl7"
+  schedule_policy {
+    expression = "0 0 * * *"
+  }
+
+  retention_period = "168h"
+
+  snapshot_spec {
+      description = "retention-snapshot"
+  }
+
+  disk_ids = [
+    "yandex_compute_disk.kibana_boot.id",
+    "yandex_compute_disk.boot_for_elastic.id",
+    "yandex_compute_disk.bastion_boot.id",
+    "yandex_compute_disk.zabbix_boot.id",
+    "yandex_compute_disk.boot_for_vm1.id",
+    "yandex_compute_disk.boot_for_vm2.id"
+  ]
+}
+
 resource "yandex_vpc_security_group" "sg1" {
   name        = "security_group"
   description = "sec group for private and bastion"
